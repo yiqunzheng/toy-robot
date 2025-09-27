@@ -1,5 +1,9 @@
 import React from 'react';
 import './Grid.css';
+import robotNorthImg from '../assets/robot-north.png';
+import robotSouthImg from '../assets/robot-south.png';
+import robotEastImg from '../assets/robot-east.png';
+import robotWestImg from '../assets/robot-west.png';
 
 interface GridProps {
   robotX?: number;
@@ -28,13 +32,18 @@ const Grid: React.FC<GridProps> = ({ robotX, robotY, robotDirection, onCellClick
           >
             {hasRobot && (
               <div className={`robot robot-${robotDirection?.toLowerCase()}`}>
-                🤖
-                <div className="robot-arrow">
-                  {robotDirection === 'NORTH' && '▲'}
-                  {robotDirection === 'SOUTH' && '▼'}
-                  {robotDirection === 'EAST' && '▶'}
-                  {robotDirection === 'WEST' && '◀'}
-                </div>
+                {robotDirection === 'NORTH' && (
+                  <img src={robotNorthImg} alt="Robot facing north" className="robot-image" />
+                )}
+                {robotDirection === 'SOUTH' && (
+                  <img src={robotSouthImg} alt="Robot facing south" className="robot-image" />
+                )}
+                {robotDirection === 'EAST' && (
+                  <img src={robotEastImg} alt="Robot facing east" className="robot-image" />
+                )}
+                {robotDirection === 'WEST' && (
+                  <img src={robotWestImg} alt="Robot facing west" className="robot-image" />
+                )}
               </div>
             )}
           </td>
