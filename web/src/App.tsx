@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Grid from './components/Grid'
 import CommandPanel from './components/CommandPanel'
+import robotAPI from './services/api'
 import './App.css'
 
 function App() {
@@ -71,6 +72,52 @@ function App() {
       alert(`Position: ${robotX},${robotY},${robotDirection}`);
     }
   };
+
+  // Keyboard controls - arrow keys for directional movement
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isRobotPlaced) return;
+
+      let newX = robotX;
+      let newY = robotY;
+      let newDirection = robotDirection;
+
+      switch (e.key) {
+        case 'ArrowUp':
+          e.preventDefault();
+          newY = robotY + 1;
+          newDirection = 'NORTH';
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          newY = robotY - 1;
+          newDirection = 'SOUTH';
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          newX = robotX - 1;
+          newDirection = 'WEST';
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          newX = robotX + 1;
+          newDirection = 'EAST';
+          break;
+        default:
+          return;
+      }
+
+      // Check boundaries and update if valid
+      if (newX >= 0 && newX <= 4 && newY >= 0 && newY <= 4) {
+        setRobotX(newX);
+        setRobotY(newY);
+        setRobotDirection(newDirection);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isRobotPlaced, robotX, robotY, robotDirection]);
 
   return (
     <div className="App">
