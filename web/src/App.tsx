@@ -12,64 +12,85 @@ function App() {
 
   const isRobotPlaced = robotX !== undefined && robotY !== undefined;
 
-  const handleCellClick = (x: number, y: number) => {
-    // PLACE command - clicking a cell places the robot facing NORTH
-    setRobotX(x);
-    setRobotY(y);
-    setRobotDirection('NORTH');
-  };
+  // Load initial robot state from backend on mount
+  useEffect(() => {
+    const loadRobotState = async () => {
+      try {
+        const response = await robotAPI.report();
+        if (response.state && response.state.isPlaced) {
+          setRobotX(response.state.x);
+          setRobotY(response.state.y);
+          setRobotDirection(response.state.direction);
+        }
+      } catch (error) {
+        console.error('Failed to load initial robot state:', error);
+      }
+    };
+    loadRobotState();
+  }, []);
 
-  const handleMove = () => {
-    if (!isRobotPlaced) return;
-
-    let newX = robotX;
-    let newY = robotY;
-
-    switch (robotDirection) {
-      case 'NORTH':
-        newY = robotY + 1;
-        break;
-      case 'SOUTH':
-        newY = robotY - 1;
-        break;
-      case 'EAST':
-        newX = robotX + 1;
-        break;
-      case 'WEST':
-        newX = robotX - 1;
-        break;
-    }
-
-    // Check boundaries (0-4 for both x and y)
-    if (newX >= 0 && newX <= 4 && newY >= 0 && newY <= 4) {
-      setRobotX(newX);
-      setRobotY(newY);
+  const handleCellClick = async (x: number, y: number) => {
+    // PLACE command via API
+    try {
+      const response = await robotAPI.place(x, y, 'NORTH');
+      if (response.success) {
+        setRobotX(response.state.x);
+        setRobotY(response.state.y);
+        setRobotDirection(response.state.direction);
+      }
+    } catch (error) {
+      console.error('Failed to place robot:', error);
     }
   };
 
-  const handleLeft = () => {
+  const handleMove = async () => {
     if (!isRobotPlaced) return;
 
-    const directions = ['NORTH', 'WEST', 'SOUTH', 'EAST'];
-    const currentIndex = directions.indexOf(robotDirection);
-    const newDirection = directions[(currentIndex + 1) % 4];
-    setRobotDirection(newDirection);
+    try {
+      const response = await robotAPI.move();
+      if (response.success) {
+        setRobotX(response.state.x);
+        setRobotY(response.state.y);
+        setRobotDirection(response.state.direction);
+      }
+    } catch (error) {
+      console.error('Failed to move robot:', error);
+    }
   };
 
-  const handleRight = () => {
+  const handleLeft = async () => {
     if (!isRobotPlaced) return;
 
-    const directions = ['NORTH', 'EAST', 'SOUTH', 'WEST'];
-    const currentIndex = directions.indexOf(robotDirection);
-    const newDirection = directions[(currentIndex + 1) % 4];
-    setRobotDirection(newDirection);
+    try {
+      const response = await robotAPI.left();
+      if (response.success) {
+        setRobotDirection(response.state.direction);
+      }
+    } catch (error) {
+      console.error('Failed to turn left:', error);
+    }
   };
 
-  const handleReport = () => {
-    if (!isRobotPlaced) {
-      alert('Robot not placed');
-    } else {
-      alert(`Position: ${robotX},${robotY},${robotDirection}`);
+  const handleRight = async () => {
+    if (!isRobotPlaced) return;
+
+    try {
+      const response = await robotAPI.right();
+      if (response.success) {
+        setRobotDirection(response.state.direction);
+      }
+    } catch (error) {
+      console.error('Failed to turn right:', error);
+    }
+  };
+
+  const handleReport = async () => {
+    try {
+      const response = await robotAPI.report();
+      alert(response.message || 'Robot not placed');
+    } catch (error) {
+      console.error('Failed to get report:', error);
+      alert('Failed to get robot position');
     }
   };
 
