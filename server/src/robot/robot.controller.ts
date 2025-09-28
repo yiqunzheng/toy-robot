@@ -36,9 +36,4 @@ export class RobotController {
     return { message, state: this.robotService.getState() };
   }
 
-  @Get('history')
-  async history() {
-    const history = await this.robotService.getHistory();
-    return { history };
-  }
 }

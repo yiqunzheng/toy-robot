@@ -108,11 +108,4 @@ export class RobotService implements OnModuleInit {
     }
   }
 
-  async getHistory() {
-    try {
-      return await this.sqliteService.getHistory();
-    } catch (error) {
-      return [];
-    }
-  }
 }
