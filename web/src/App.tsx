@@ -159,10 +159,9 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Toy Robot Simulator</h1>
-      <p className="instructions">
+      <div className="instructions">
         Click to place the robot, use the buttons or arrows to move
-      </p>
+      </div>
       <Grid
         robotX={robotX}
         robotY={robotY}

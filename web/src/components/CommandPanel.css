@@ -21,15 +21,6 @@
   border-radius: 8px;
   cursor: pointer;
   min-width: 100px;
-  outline: none;
-}
-
-.command-button:hover {
-  background-color: #00d9ff;
-}
-
-.command-button:focus {
-  outline: none;
 }
 
 .command-button:disabled {
@@ -39,11 +30,8 @@
 
 .report-button {
   background-color: transparent;
-  color: #00d9ff;
+  color: #ffffff;
   border: 2px solid #00d9ff;
-}
-
-.report-button:hover {
-  background-color: transparent;
-  border: 2px solid #00d9ff;
+  min-width: 140px;
+  padding: 12px 40px;
 }

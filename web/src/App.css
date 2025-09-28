@@ -15,14 +15,12 @@
   padding: 40px 20px;
 }
 
-.App h1 {
-  color: #fff;
-  margin: 0;
-  font-size: 2rem;
-}
-
 .instructions {
-  color: #a0aec0;
-  margin: 0;
+  background-color: #2d3748;
+  color: #e2e8f0;
+  padding: 15px 30px;
+  border-radius: 8px;
   font-size: 1rem;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
