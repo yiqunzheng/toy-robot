@@ -21,9 +21,18 @@ function App() {
           setRobotX(response.state.x);
           setRobotY(response.state.y);
           setRobotDirection(response.state.direction);
+        } else {
+          // Ensure robot starts unplaced if not in database
+          setRobotX(undefined);
+          setRobotY(undefined);
+          setRobotDirection('NORTH');
         }
       } catch (error) {
         console.error('Failed to load initial robot state:', error);
+        // Start with empty grid if API fails
+        setRobotX(undefined);
+        setRobotY(undefined);
+        setRobotDirection('NORTH');
       }
     };
     loadRobotState();

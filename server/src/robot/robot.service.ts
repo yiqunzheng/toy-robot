@@ -1,31 +1,31 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Robot, Direction } from './robot.model';
-import { RobotPosition } from '../database/entities/robot-position.entity';
-import { RobotHistory } from '../database/entities/robot-history.entity';
+import { SqliteService } from '../database/sqlite.service';
 
 @Injectable()
 export class RobotService implements OnModuleInit {
   private robot: Robot;
 
-  constructor(
-    @InjectRepository(RobotPosition)
-    private positionRepository: Repository<RobotPosition>,
-    @InjectRepository(RobotHistory)
-    private historyRepository: Repository<RobotHistory>,
-  ) {
+  constructor(private sqliteService: SqliteService) {
     this.robot = new Robot();
   }
 
   async onModuleInit() {
-    await this.loadRobotState();
+    try {
+      await this.loadRobotState();
+    } catch (error) {
+      console.log('Database not ready yet, starting with unplaced robot');
+    }
   }
 
   private async loadRobotState() {
-    const savedPosition = await this.positionRepository.findOne({ where: { id: 1 } });
-    if (savedPosition && savedPosition.isPlaced) {
-      this.robot.place(savedPosition.x, savedPosition.y, savedPosition.direction as Direction);
+    try {
+      const savedPosition = await this.sqliteService.getPosition();
+      if (savedPosition && savedPosition.isPlaced) {
+        this.robot.place(savedPosition.x, savedPosition.y, savedPosition.direction as Direction);
+      }
+    } catch (error) {
+      // Silently fail if database isn't ready
     }
   }
 
@@ -80,33 +80,39 @@ export class RobotService implements OnModuleInit {
 
   private async savePosition() {
     if (this.robot.isPlaced) {
-      const position = new RobotPosition();
-      position.id = 1;
-      position.x = this.robot.x;
-      position.y = this.robot.y;
-      position.direction = this.robot.direction;
-      position.isPlaced = this.robot.isPlaced;
-
-      await this.positionRepository.save(position);
+      try {
+        await this.sqliteService.savePosition({
+          x: this.robot.x,
+          y: this.robot.y,
+          direction: this.robot.direction,
+          isPlaced: this.robot.isPlaced
+        });
+      } catch (error) {
+        console.log('Database save failed, continuing without persistence');
+      }
     }
   }
 
   private async addHistory(action: string) {
     if (this.robot.isPlaced) {
-      const history = new RobotHistory();
-      history.x = this.robot.x;
-      history.y = this.robot.y;
-      history.direction = this.robot.direction;
-      history.action = action;
-
-      await this.historyRepository.save(history);
+      try {
+        await this.sqliteService.addHistory({
+          x: this.robot.x,
+          y: this.robot.y,
+          direction: this.robot.direction,
+          action
+        });
+      } catch (error) {
+        console.log('History save failed, continuing without history');
+      }
     }
   }
 
-  async getHistory(): Promise<RobotHistory[]> {
-    return this.historyRepository.find({
-      order: { createdAt: 'DESC' },
-      take: 100,
-    });
+  async getHistory() {
+    try {
+      return await this.sqliteService.getHistory();
+    } catch (error) {
+      return [];
+    }
   }
 }

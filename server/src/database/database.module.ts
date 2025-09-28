@@ -7,10 +7,10 @@ import { RobotHistory } from './entities/robot-history.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
-      database: 'robot.db',
+      database: '../robot.db',
       entities: [RobotPosition, RobotHistory],
       synchronize: true, // Auto-create tables in development
-      logging: false,
+      logging: true,
     }),
     TypeOrmModule.forFeature([RobotPosition, RobotHistory]),
   ],
