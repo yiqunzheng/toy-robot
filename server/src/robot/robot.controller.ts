@@ -7,26 +7,26 @@ export class RobotController {
   constructor(private readonly robotService: RobotService) {}
 
   @Post('place')
-  place(@Body() body: { x: number; y: number; direction: Direction }) {
-    const success = this.robotService.place(body.x, body.y, body.direction);
+  async place(@Body() body: { x: number; y: number; direction: Direction }) {
+    const success = await this.robotService.place(body.x, body.y, body.direction);
     return { success, state: this.robotService.getState() };
   }
 
   @Post('move')
-  move() {
-    const result = this.robotService.move();
+  async move() {
+    const result = await this.robotService.move();
     return { ...result, state: this.robotService.getState() };
   }
 
   @Post('left')
-  left() {
-    const success = this.robotService.left();
+  async left() {
+    const success = await this.robotService.left();
     return { success, state: this.robotService.getState() };
   }
 
   @Post('right')
-  right() {
-    const success = this.robotService.right();
+  async right() {
+    const success = await this.robotService.right();
     return { success, state: this.robotService.getState() };
   }
 
@@ -34,5 +34,11 @@ export class RobotController {
   report() {
     const message = this.robotService.report();
     return { message, state: this.robotService.getState() };
+  }
+
+  @Get('history')
+  async history() {
+    const history = await this.robotService.getHistory();
+    return { history };
   }
 }
