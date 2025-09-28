@@ -105,43 +105,51 @@ function App() {
 
   // Keyboard controls - arrow keys for directional movement
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = async (e: KeyboardEvent) => {
       if (!isRobotPlaced) return;
 
-      let newX = robotX;
-      let newY = robotY;
-      let newDirection = robotDirection;
+      let targetX = robotX;
+      let targetY = robotY;
+      let targetDirection = robotDirection;
 
       switch (e.key) {
         case 'ArrowUp':
           e.preventDefault();
-          newY = robotY + 1;
-          newDirection = 'NORTH';
+          targetY = robotY + 1;
+          targetDirection = 'NORTH';
           break;
         case 'ArrowDown':
           e.preventDefault();
-          newY = robotY - 1;
-          newDirection = 'SOUTH';
+          targetY = robotY - 1;
+          targetDirection = 'SOUTH';
           break;
         case 'ArrowLeft':
           e.preventDefault();
-          newX = robotX - 1;
-          newDirection = 'WEST';
+          targetX = robotX - 1;
+          targetDirection = 'WEST';
           break;
         case 'ArrowRight':
           e.preventDefault();
-          newX = robotX + 1;
-          newDirection = 'EAST';
+          targetX = robotX + 1;
+          targetDirection = 'EAST';
           break;
         default:
           return;
       }
 
-      // Check boundaries and update if valid
-      if (newX >= 0 && newX <= 4 && newY >= 0 && newY <= 4) {
-        setRobotX(newX);
-        setRobotY(newY);
-        setRobotDirection(newDirection);
+      // Check boundaries before making API call
+      if (targetX >= 0 && targetX <= 4 && targetY >= 0 && targetY <= 4) {
+        try {
+          // Use API to ensure database logging
+          const response = await robotAPI.place(targetX, targetY, targetDirection);
+          if (response.success) {
+            setRobotX(response.state.x);
+            setRobotY(response.state.y);
+            setRobotDirection(response.state.direction);
+          }
+        } catch (error) {
+          console.error('Failed to move robot via arrow keys:', error);
+        }
       }
     };
 
